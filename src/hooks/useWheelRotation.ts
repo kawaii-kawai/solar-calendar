@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 
 export function useWheelRotation() {
   const [angle, setAngle] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   const dragging = useRef(false);
   const prevAngle = useRef(0);
@@ -27,6 +28,7 @@ export function useWheelRotation() {
 
   function onPointerDown(e: React.PointerEvent) {
     dragging.current = true;
+    setIsDragging(true);
 
     const center = getCenter(e);
     prevAngle.current = getAngle(e, center.x, center.y);
@@ -49,12 +51,20 @@ export function useWheelRotation() {
 
   function onPointerUp() {
     dragging.current = false;
+    setIsDragging(false);
+  }
+
+  function onPointerLeave() {
+    dragging.current = false;
+    setIsDragging(false);
   }
 
   return {
     angle,
+    isDragging,
     onPointerDown,
     onPointerMove,
     onPointerUp,
+    onPointerLeave,
   };
 }

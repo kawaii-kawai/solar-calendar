@@ -2,16 +2,17 @@ import { polarToCartesian } from "../utils/geometry";
 
 interface Props {
   angle: number;
+  radius: number;
 }
 
-export default function Earth({ angle }: Props) {
-  const pos = polarToCartesian(200, 200, 140, angle);
+export default function Earth({ angle, radius }: Props) {
+  const pos = polarToCartesian(200, 200, radius, angle);
 
   return (
     <circle
       cx={pos.x}
       cy={pos.y}
-      r={12}
+      r={16}
       className="earth"
     />
   );

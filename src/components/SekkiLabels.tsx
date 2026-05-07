@@ -3,9 +3,10 @@ import { polarToCartesian } from "../utils/geometry";
 
 interface Props {
   sekki: Sekki[];
+  radius: number;
 }
 
-export default function SekkiLabels({ sekki }: Props) {
+export default function SekkiLabels({ sekki, radius }: Props) {
   return (
     <>
       {sekki.map((s) => {
@@ -15,7 +16,7 @@ export default function SekkiLabels({ sekki }: Props) {
         const pos = polarToCartesian(
           200,
           200,
-          170,
+          radius,
           s.solar_longitude
         );
 

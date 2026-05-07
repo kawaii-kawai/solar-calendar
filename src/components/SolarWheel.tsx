@@ -60,15 +60,18 @@ export default function SolarWheel() {
     .slice()
     .sort((a, b) => a.solar_longitude - b.solar_longitude);
 
+  const orbitRadius = 150;
+
   return (
     <svg
-      className="solar-wheel"
+      className={`solar-wheel${wheel.isDragging ? " is-dragging" : ""}`}
       width="100%"
       height="100%"
       viewBox="0 0 400 400"
       onPointerDown={wheel.onPointerDown}
       onPointerMove={wheel.onPointerMove}
       onPointerUp={wheel.onPointerUp}
+      onPointerLeave={wheel.onPointerLeave}
     >
       <defs>
         <radialGradient id="sky" cx="50%" cy="45%" r="70%">
@@ -91,8 +94,8 @@ export default function SolarWheel() {
 
       <circle cx={200} cy={200} r={80} fill="url(#sunGlow)" />
 
-      <Orbit />
-      <SekkiLabels sekki={displaySekki} />
+      <Orbit radius={orbitRadius} />
+      <SekkiLabels sekki={displaySekki} radius={orbitRadius} />
       {status !== "ready" && (
         <text
           x={200}
@@ -107,13 +110,14 @@ export default function SolarWheel() {
       )}
       <text
         x={200}
-        y={378}
+        y={206}
         textAnchor="middle"
+        dominantBaseline="middle"
         className="year-label"
       >
         {currentYear}
       </text>
-      <Earth angle={wheel.angle} />
+      <Earth angle={wheel.angle} radius={orbitRadius} />
       <Sun />
     </svg>
   );

@@ -3,7 +3,7 @@ export default function Sun() {
     <circle
       cx={200}
       cy={200}
-      r={32}
+      r={22}
       className="sun"
     />
   );
