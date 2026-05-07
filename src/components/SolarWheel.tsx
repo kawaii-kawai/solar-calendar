@@ -107,7 +107,7 @@ export default function SolarWheel() {
       )}
       <text
         x={200}
-        y={46}
+        y={378}
         textAnchor="middle"
         className="year-label"
       >

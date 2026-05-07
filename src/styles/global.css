@@ -66,8 +66,8 @@ body {
   position: relative;
   border-radius: 32px;
   padding: clamp(10px, 2vw, 24px);
-  background: linear-gradient(140deg, rgba(16, 23, 32, 0.9), rgba(6, 8, 12, 0.8));
-  border: 1px solid rgba(91, 110, 135, 0.45);
+  background: #05070a;
+  border: 1px solid rgba(91, 110, 135, 0.4);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
   display: grid;
   place-items: center;
@@ -109,7 +109,7 @@ body {
 
 .year-label {
   fill: rgba(255, 233, 200, 0.9);
-  font-size: 16px;
+  font-size: 14px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }

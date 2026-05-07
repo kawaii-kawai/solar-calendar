@@ -4,9 +4,9 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <p className="eyebrow">Solar Calendar</p>
-        <h1>Twenty-Four Sekki</h1>
-        <p className="subhead">Drag the wheel to explore seasonal points.</p>
+        <p className="eyebrow">季節の輪</p>
+        <h1>二十四節気</h1>
+        <p className="subhead">ドラッグで年を切り替えます</p>
       </header>
 
       <div className="wheel-frame">
