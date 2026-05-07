@@ -9,6 +9,33 @@ import { loadSekki } from "../utils/sekki";
 
 import { useWheelRotation } from "../hooks/useWheelRotation";
 
+const SEKKI_ORDER: Array<Pick<Sekki, "name_ja" | "solar_longitude">> = [
+  { name_ja: "春分", solar_longitude: 0 },
+  { name_ja: "清明", solar_longitude: 15 },
+  { name_ja: "穀雨", solar_longitude: 30 },
+  { name_ja: "立夏", solar_longitude: 45 },
+  { name_ja: "小満", solar_longitude: 60 },
+  { name_ja: "芒種", solar_longitude: 75 },
+  { name_ja: "夏至", solar_longitude: 90 },
+  { name_ja: "小暑", solar_longitude: 105 },
+  { name_ja: "大暑", solar_longitude: 120 },
+  { name_ja: "立秋", solar_longitude: 135 },
+  { name_ja: "処暑", solar_longitude: 150 },
+  { name_ja: "白露", solar_longitude: 165 },
+  { name_ja: "秋分", solar_longitude: 180 },
+  { name_ja: "寒露", solar_longitude: 195 },
+  { name_ja: "霜降", solar_longitude: 210 },
+  { name_ja: "立冬", solar_longitude: 225 },
+  { name_ja: "小雪", solar_longitude: 240 },
+  { name_ja: "大雪", solar_longitude: 255 },
+  { name_ja: "冬至", solar_longitude: 270 },
+  { name_ja: "小寒", solar_longitude: 285 },
+  { name_ja: "大寒", solar_longitude: 300 },
+  { name_ja: "立春", solar_longitude: 315 },
+  { name_ja: "雨水", solar_longitude: 330 },
+  { name_ja: "啓蟄", solar_longitude: 345 },
+];
+
 export default function SolarWheel() {
   const [sekki, setSekki] = useState<Sekki[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -55,13 +82,53 @@ export default function SolarWheel() {
     ? ((rotationIndex % years.length) + years.length) % years.length
     : 0;
   const currentYear = years[yearIndex] ?? 2000;
-  const displaySekki = (grouped.get(currentYear) ?? [])
-    .slice()
-    .sort((a, b) => a.solar_longitude - b.solar_longitude);
+  const currentByName = new Map(
+    (grouped.get(currentYear) ?? []).map((item) => [item.name_ja, item])
+  );
+
+  const byName = new Map<string, Array<{ year: number; datetime: string }>>();
+  for (const item of sekki) {
+    const year = Number(item.datetime.slice(0, 4));
+    if (!Number.isFinite(year)) continue;
+    const list = byName.get(item.name_ja) ?? [];
+    list.push({ year, datetime: item.datetime });
+    byName.set(item.name_ja, list);
+  }
+
+  for (const list of byName.values()) {
+    list.sort((a, b) => a.year - b.year);
+  }
+
+  function fallbackDate(name: string): string {
+    const list = byName.get(name);
+    if (!list || list.length === 0) return "";
+
+    let best = list[0];
+    let bestDiff = Math.abs(best.year - currentYear);
+    for (const item of list) {
+      const diff = Math.abs(item.year - currentYear);
+      if (diff < bestDiff) {
+        best = item;
+        bestDiff = diff;
+      }
+    }
+    return best.datetime;
+  }
+
+  const displaySekki = SEKKI_ORDER.map((entry) => {
+    const current = currentByName.get(entry.name_ja);
+    const datetime = current ? current.datetime : fallbackDate(entry.name_ja);
+    return {
+      name_ja: entry.name_ja,
+      solar_longitude: entry.solar_longitude,
+      datetime,
+    };
+  });
 
   const orbitRadius = 150;
   const earthAngle = ((wheel.angle % 360) + 360) % 360;
   let activeName: string | undefined;
+  let activeLongitude: number | undefined;
   let bestDiff = Number.POSITIVE_INFINITY;
 
   for (const s of displaySekki) {
@@ -70,10 +137,12 @@ export default function SolarWheel() {
     if (diff < bestDiff) {
       bestDiff = diff;
       activeName = s.name_ja;
+      activeLongitude = s.solar_longitude;
     }
   }
 
   const highlight = bestDiff <= 10 ? activeName : undefined;
+  const highlightLongitude = highlight ? activeLongitude : undefined;
 
   return (
     <svg
@@ -123,8 +192,9 @@ export default function SolarWheel() {
         sekki={displaySekki}
         radius={orbitRadius}
         activeName={highlight}
+        activeLongitude={highlightLongitude}
       />
-      <circle cx={200} cy={200} r={40} fill="url(#sunBack)" className="sun-back" />
+      <circle cx={200} cy={200} r={60} fill="url(#sunBack)" className="sun-back" />
       <text
         x={200}
         y={200}
