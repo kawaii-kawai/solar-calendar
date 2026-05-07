@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import Orbit from "./Orbit";
-import Sun from "./Sun";
 import Earth from "./Earth";
 import SekkiLabels from "./SekkiLabels";
 
@@ -79,11 +78,6 @@ export default function SolarWheel() {
           <stop offset="55%" stopColor="#0a1117" />
           <stop offset="100%" stopColor="#05070a" />
         </radialGradient>
-        <radialGradient id="sunGlow" cx="50%" cy="50%" r="65%">
-          <stop offset="0%" stopColor="#ffd27d" stopOpacity="1" />
-          <stop offset="60%" stopColor="#ffae40" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#ff8a00" stopOpacity="0" />
-        </radialGradient>
       </defs>
 
       <rect x={0} y={0} width={400} height={400} fill="url(#sky)" />
@@ -92,10 +86,31 @@ export default function SolarWheel() {
         <circle key={index} cx={x} cy={y} r={r} className="star" />
       ))}
 
-      <circle cx={200} cy={200} r={80} fill="url(#sunGlow)" />
-
       <Orbit radius={orbitRadius} />
-      <SekkiLabels sekki={displaySekki} radius={orbitRadius} />
+      {(() => {
+        const earthAngle = ((wheel.angle % 360) + 360) % 360;
+        let activeName: string | undefined;
+        let bestDiff = Number.POSITIVE_INFINITY;
+
+        for (const s of displaySekki) {
+          const raw = Math.abs(s.solar_longitude - earthAngle);
+          const diff = Math.min(raw, 360 - raw);
+          if (diff < bestDiff) {
+            bestDiff = diff;
+            activeName = s.name_ja;
+          }
+        }
+
+        const highlight = bestDiff <= 8 ? activeName : undefined;
+
+        return (
+          <SekkiLabels
+            sekki={displaySekki}
+            radius={orbitRadius}
+            activeName={highlight}
+          />
+        );
+      })()}
       {status !== "ready" && (
         <text
           x={200}
@@ -110,15 +125,14 @@ export default function SolarWheel() {
       )}
       <text
         x={200}
-        y={206}
+        y={200}
         textAnchor="middle"
         dominantBaseline="middle"
         className="year-label"
       >
         {currentYear}
       </text>
-      <Earth angle={wheel.angle} radius={orbitRadius} />
-      <Sun />
+      <Earth angle={wheel.angle} radius={orbitRadius} isDragging={wheel.isDragging} />
     </svg>
   );
 }

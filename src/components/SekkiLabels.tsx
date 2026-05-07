@@ -4,9 +4,10 @@ import { polarToCartesian } from "../utils/geometry";
 interface Props {
   sekki: Sekki[];
   radius: number;
+  activeName?: string;
 }
 
-export default function SekkiLabels({ sekki, radius }: Props) {
+export default function SekkiLabels({ sekki, radius, activeName }: Props) {
   return (
     <>
       {sekki.map((s) => {
@@ -27,7 +28,7 @@ export default function SekkiLabels({ sekki, radius }: Props) {
               y={pos.y - 6}
               textAnchor="middle"
               dominantBaseline="middle"
-              className="sekki-label"
+              className={`sekki-label${s.name_ja === activeName ? " is-active" : ""}`}
             >
               {s.name_ja}
             </text>
@@ -36,7 +37,7 @@ export default function SekkiLabels({ sekki, radius }: Props) {
               y={pos.y + 8}
               textAnchor="middle"
               dominantBaseline="middle"
-              className="sekki-date"
+              className={`sekki-date${s.name_ja === activeName ? " is-active" : ""}`}
             >
               {dateText}
             </text>
