@@ -89,7 +89,7 @@ export function useWheelRotation() {
       }
 
       setAngle((a) => a + speed * dt);
-      velocity.current *= 0.96;
+      velocity.current *= 0.9;
       rafId.current = requestAnimationFrame(step);
     };
 

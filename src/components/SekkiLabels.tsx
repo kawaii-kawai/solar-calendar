@@ -8,6 +8,8 @@ interface Props {
 }
 
 export default function SekkiLabels({ sekki, radius, activeName }: Props) {
+  const hasActive = Boolean(activeName);
+
   return (
     <>
       {sekki.map((s) => {
@@ -21,14 +23,20 @@ export default function SekkiLabels({ sekki, radius, activeName }: Props) {
           s.solar_longitude
         );
 
+        const isActive = s.name_ja === activeName;
+        const isDim = hasActive && !isActive;
+
         return (
-          <g key={`${s.name_ja}-${s.datetime}`}>
+          <g
+            key={`${s.name_ja}-${s.datetime}`}
+            className={`sekki-item${isActive ? " is-active" : ""}${isDim ? " is-dim" : ""}`}
+          >
             <text
               x={pos.x}
               y={pos.y - 6}
               textAnchor="middle"
               dominantBaseline="middle"
-              className={`sekki-label${s.name_ja === activeName ? " is-active" : ""}`}
+              className="sekki-label"
             >
               {s.name_ja}
             </text>
@@ -37,7 +45,7 @@ export default function SekkiLabels({ sekki, radius, activeName }: Props) {
               y={pos.y + 8}
               textAnchor="middle"
               dominantBaseline="middle"
-              className={`sekki-date${s.name_ja === activeName ? " is-active" : ""}`}
+              className="sekki-date"
             >
               {dateText}
             </text>

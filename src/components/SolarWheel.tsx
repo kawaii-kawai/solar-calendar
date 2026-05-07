@@ -60,6 +60,20 @@ export default function SolarWheel() {
     .sort((a, b) => a.solar_longitude - b.solar_longitude);
 
   const orbitRadius = 150;
+  const earthAngle = ((wheel.angle % 360) + 360) % 360;
+  let activeName: string | undefined;
+  let bestDiff = Number.POSITIVE_INFINITY;
+
+  for (const s of displaySekki) {
+    const raw = Math.abs(s.solar_longitude - earthAngle);
+    const diff = Math.min(raw, 360 - raw);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      activeName = s.name_ja;
+    }
+  }
+
+  const highlight = bestDiff <= 10 ? activeName : undefined;
 
   return (
     <svg
@@ -78,6 +92,11 @@ export default function SolarWheel() {
           <stop offset="55%" stopColor="#0a1117" />
           <stop offset="100%" stopColor="#05070a" />
         </radialGradient>
+        <radialGradient id="sunBack" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stopColor="#ffd27d" stopOpacity="0.9" />
+          <stop offset="70%" stopColor="#ffb24a" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#ff8a00" stopOpacity="0" />
+        </radialGradient>
       </defs>
 
       <rect x={0} y={0} width={400} height={400} fill="url(#sky)" />
@@ -87,30 +106,6 @@ export default function SolarWheel() {
       ))}
 
       <Orbit radius={orbitRadius} />
-      {(() => {
-        const earthAngle = ((wheel.angle % 360) + 360) % 360;
-        let activeName: string | undefined;
-        let bestDiff = Number.POSITIVE_INFINITY;
-
-        for (const s of displaySekki) {
-          const raw = Math.abs(s.solar_longitude - earthAngle);
-          const diff = Math.min(raw, 360 - raw);
-          if (diff < bestDiff) {
-            bestDiff = diff;
-            activeName = s.name_ja;
-          }
-        }
-
-        const highlight = bestDiff <= 8 ? activeName : undefined;
-
-        return (
-          <SekkiLabels
-            sekki={displaySekki}
-            radius={orbitRadius}
-            activeName={highlight}
-          />
-        );
-      })()}
       {status !== "ready" && (
         <text
           x={200}
@@ -123,6 +118,13 @@ export default function SolarWheel() {
           {status === "loading" ? "Loading sekki.json..." : error}
         </text>
       )}
+      <Earth angle={wheel.angle} radius={orbitRadius} isDragging={wheel.isDragging} />
+      <SekkiLabels
+        sekki={displaySekki}
+        radius={orbitRadius}
+        activeName={highlight}
+      />
+      <circle cx={200} cy={200} r={40} fill="url(#sunBack)" className="sun-back" />
       <text
         x={200}
         y={200}
@@ -132,7 +134,6 @@ export default function SolarWheel() {
       >
         {currentYear}
       </text>
-      <Earth angle={wheel.angle} radius={orbitRadius} isDragging={wheel.isDragging} />
     </svg>
   );
 }
