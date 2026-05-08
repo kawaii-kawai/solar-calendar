@@ -77,7 +77,8 @@ export default function SolarWheel() {
   }
 
   const years = Array.from(grouped.keys()).sort((a, b) => a - b);
-  const rotationIndex = Math.trunc(wheel.angle / 360);
+  const yearShift = 285;
+  const rotationIndex = Math.floor((wheel.angle - yearShift) / 360);
   const yearIndex = years.length
     ? ((rotationIndex % years.length) + years.length) % years.length
     : 0;
@@ -128,6 +129,7 @@ export default function SolarWheel() {
   const orbitRadius = 150;
   const earthAngle = ((wheel.angle % 360) + 360) % 360;
   let activeName: string | undefined;
+  let activeItem: Sekki | undefined;
   let activeLongitude: number | undefined;
   let bestDiff = Number.POSITIVE_INFINITY;
 
@@ -137,12 +139,15 @@ export default function SolarWheel() {
     if (diff < bestDiff) {
       bestDiff = diff;
       activeName = s.name_ja;
+      activeItem = s;
       activeLongitude = s.solar_longitude;
     }
   }
 
   const highlight = bestDiff <= 10 ? activeName : undefined;
   const highlightLongitude = highlight ? activeLongitude : undefined;
+  const highlightYear = activeItem?.datetime.slice(0, 4) ?? "----";
+  const highlightDate = activeItem?.datetime.slice(5, 10).replace("-", "/") ?? "--/--";
 
   return (
     <svg
@@ -194,6 +199,18 @@ export default function SolarWheel() {
         activeName={highlight}
         activeLongitude={highlightLongitude}
       />
+      {highlight && (
+        <g className="highlight-panel">
+          <rect x={52} y={-52} width={296} height={104} rx={18} />
+          <text x={200} y={-12} textAnchor="middle" className="highlight-name">
+            {highlight}
+          </text>
+          <text x={200} y={18} textAnchor="middle" className="highlight-meta">
+            <tspan x={145}>{highlightYear}年</tspan>
+            <tspan x={255}>{highlightDate}</tspan>
+          </text>
+        </g>
+      )}
       <circle cx={200} cy={200} r={60} fill="url(#sunBack)" className="sun-back" />
       <text
         x={200}

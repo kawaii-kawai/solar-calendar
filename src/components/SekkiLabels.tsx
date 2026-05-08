@@ -33,16 +33,14 @@ export default function SekkiLabels({
           isNeighbor = diff <= 20;
         }
 
-        const labelPos = isActive ? { x: 200, y: 34 } : { x: pos.x, y: pos.y };
-
         return (
           <g
             key={`${s.name_ja}-${s.datetime}`}
             className={`sekki-item${isActive ? " is-active" : ""}${isNeighbor ? " is-neighbor" : ""}`}
           >
             <text
-              x={labelPos.x}
-              y={labelPos.y - 6}
+              x={pos.x}
+              y={pos.y - 6}
               textAnchor="middle"
               dominantBaseline="middle"
               className="sekki-label"
@@ -50,8 +48,8 @@ export default function SekkiLabels({
               {s.name_ja}
             </text>
             <text
-              x={labelPos.x}
-              y={labelPos.y + 8}
+              x={pos.x}
+              y={pos.y + 8}
               textAnchor="middle"
               dominantBaseline="middle"
               className="sekki-date"
