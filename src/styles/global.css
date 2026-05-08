@@ -71,6 +71,7 @@ body {
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
   display: grid;
   place-items: center;
+  margin-top: 24px;
 }
 
 .solar-wheel {
@@ -163,7 +164,7 @@ body {
 
 .highlight-name {
   fill: #ffe7c1;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 700;
   font-family: "Noto Serif JP", "Yu Mincho", "Hiragino Mincho ProN", serif;
   letter-spacing: 0.16em;
@@ -174,7 +175,13 @@ body {
   font-size: 14px;
   font-weight: 600;
   font-family: "Noto Serif JP", "Yu Mincho", "Hiragino Mincho ProN", serif;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
+}
+
+.highlight-desc {
+  fill: rgba(236, 214, 190, 0.9);
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .sun {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Orbit from "./Orbit";
 import Earth from "./Earth";
@@ -36,10 +36,38 @@ const SEKKI_ORDER: Array<Pick<Sekki, "name_ja" | "solar_longitude">> = [
   { name_ja: "啓蟄", solar_longitude: 345 },
 ];
 
+const SEKKI_DESC: Record<string, string> = {
+  春分: "昼夜がほぼ等しい",
+  清明: "草木が清らかに",
+  穀雨: "恵みの雨が降る",
+  立夏: "夏の気配が立つ",
+  小満: "草木が満ち始める",
+  芒種: "種を蒔くころ",
+  夏至: "一年で昼が最長",
+  小暑: "暑さが増す",
+  大暑: "暑さが極まる",
+  立秋: "秋の気配が立つ",
+  処暑: "暑さが収まる",
+  白露: "露が白く光る",
+  秋分: "昼夜がほぼ等しい",
+  寒露: "露が冷たくなる",
+  霜降: "霜が降り始める",
+  立冬: "冬の気配が立つ",
+  小雪: "雪が舞い始める",
+  大雪: "雪が本格化する",
+  冬至: "一年で夜が最長",
+  小寒: "寒さが増す",
+  大寒: "寒さが極まる",
+  立春: "春の気配が立つ",
+  雨水: "雪が雨に変わる",
+  啓蟄: "虫が動き始める",
+};
+
 export default function SolarWheel() {
   const [sekki, setSekki] = useState<Sekki[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [error, setError] = useState<string>("");
+  const defaulted = useRef(false);
 
   const wheel = useWheelRotation();
 
@@ -78,6 +106,16 @@ export default function SolarWheel() {
 
   const years = Array.from(grouped.keys()).sort((a, b) => a - b);
   const yearShift = 285;
+
+  useEffect(() => {
+    if (defaulted.current) return;
+    if (!years.length) return;
+    const targetIndex = years.indexOf(2026);
+    if (targetIndex < 0) return;
+    wheel.setAngle(targetIndex * 360 + yearShift);
+    defaulted.current = true;
+  }, [years, yearShift, wheel]);
+
   const rotationIndex = Math.floor((wheel.angle - yearShift) / 360);
   const yearIndex = years.length
     ? ((rotationIndex % years.length) + years.length) % years.length
@@ -148,6 +186,7 @@ export default function SolarWheel() {
   const highlightLongitude = highlight ? activeLongitude : undefined;
   const highlightYear = activeItem?.datetime.slice(0, 4) ?? "----";
   const highlightDate = activeItem?.datetime.slice(5, 10).replace("-", "/") ?? "--/--";
+  const highlightDesc = activeName ? SEKKI_DESC[activeName] ?? "" : "";
 
   return (
     <svg
@@ -201,13 +240,15 @@ export default function SolarWheel() {
       />
       {highlight && (
         <g className="highlight-panel">
-          <rect x={52} y={-52} width={296} height={104} rx={18} />
-          <text x={200} y={-12} textAnchor="middle" className="highlight-name">
+          <rect x={32} y={-118} width={336} height={100} rx={18} />
+          <text x={56} y={-78} textAnchor="start" className="highlight-name">
             {highlight}
           </text>
-          <text x={200} y={18} textAnchor="middle" className="highlight-meta">
-            <tspan x={145}>{highlightYear}年</tspan>
-            <tspan x={255}>{highlightDate}</tspan>
+          <text x={210} y={-80} textAnchor="start" className="highlight-meta">
+            <tspan x={210}>{highlightYear}年 {highlightDate}</tspan>
+            <tspan x={210} dy={22} className="highlight-desc">
+              {highlightDesc}
+            </tspan>
           </text>
         </g>
       )}

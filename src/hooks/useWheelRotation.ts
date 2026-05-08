@@ -99,6 +99,7 @@ export function useWheelRotation() {
 
   return {
     angle,
+    setAngle,
     isDragging,
     onPointerDown,
     onPointerMove,
