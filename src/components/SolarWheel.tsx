@@ -252,10 +252,10 @@ export default function SolarWheel() {
       {highlight && (
         <g className="highlight-panel">
           <rect x={32} y={-118} width={336} height={100} rx={18} />
-          <text x={56} y={-78} textAnchor="start" className="highlight-name">
+          <text x={56} y={-66} textAnchor="start" className="highlight-name">
             {highlight}
           </text>
-          <text x={210} y={-80} textAnchor="start" className="highlight-meta">
+          <text x={210} y={-66} textAnchor="start" className="highlight-meta">
             <tspan x={210}>{highlightYear}年 {highlightDate}</tspan>
             <tspan x={210} dy={22} className="highlight-desc">
               {highlightDesc}
