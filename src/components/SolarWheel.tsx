@@ -6,6 +6,7 @@ import SekkiLabels from "./SekkiLabels";
 
 import type { Sekki } from "../types/sekki";
 import { loadSekki } from "../utils/sekki";
+import { polarToCartesian } from "../utils/geometry";
 
 import { useWheelRotation } from "../hooks/useWheelRotation";
 
@@ -63,6 +64,33 @@ const SEKKI_DESC: Record<string, string> = {
   啓蟄: "虫が動き始める",
 };
 
+const SEKKI_FURIGANA: Record<string, string> = {
+  春分: "しゅんぶん",
+  清明: "せいめい",
+  穀雨: "こくう",
+  立夏: "りっか",
+  小満: "しょうまん",
+  芒種: "ぼうしゅ",
+  夏至: "げし",
+  小暑: "しょうしょ",
+  大暑: "たいしょ",
+  立秋: "りっしゅう",
+  処暑: "しょしょ",
+  白露: "はくろ",
+  秋分: "しゅうぶん",
+  寒露: "かんろ",
+  霜降: "そうこう",
+  立冬: "りっとう",
+  小雪: "しょうせつ",
+  大雪: "たいせつ",
+  冬至: "とうじ",
+  小寒: "しょうかん",
+  大寒: "だいかん",
+  立春: "りっしゅん",
+  雨水: "うすい",
+  啓蟄: "けいちつ",
+};
+
 const SEKKI_DEFAULT_DATE: Record<string, string> = {
   啓蟄: "03-05",
   穀雨: "04-20",
@@ -70,6 +98,18 @@ const SEKKI_DEFAULT_DATE: Record<string, string> = {
   芒種: "06-06",
   処暑: "08-23",
 };
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function parseDateUtc(datetime: string) {
+  return new Date(`${datetime}Z`);
+}
+
+function formatMonthDay(date: Date) {
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${month}/${day}`;
+}
 
 export default function SolarWheel() {
   const [sekki, setSekki] = useState<Sekki[]>([]);
@@ -198,6 +238,28 @@ export default function SolarWheel() {
   const highlightYear = activeItem?.datetime.slice(0, 4) ?? "----";
   const highlightDate = activeItem?.datetime.slice(5, 10).replace("-", "/") ?? "--/--";
   const highlightDesc = activeName ? SEKKI_DESC[activeName] ?? "" : "";
+  const highlightFurigana = activeName ? SEKKI_FURIGANA[activeName] ?? "" : "";
+
+  const risshun = displaySekki.find(
+    (item) => item.name_ja === "立春" && item.datetime
+  );
+  const nextRisshun = grouped
+    .get(currentYear + 1)
+    ?.find((item) => item.name_ja === "立春");
+
+  let hachiju: { angle: number; dateText: string } | undefined;
+  if (risshun?.datetime) {
+    const start = parseDateUtc(risshun.datetime);
+    const target = new Date(start.getTime() + 88 * MS_PER_DAY);
+    const lengthDays = nextRisshun?.datetime
+      ? Math.max(
+          1,
+          Math.round((parseDateUtc(nextRisshun.datetime).getTime() - start.getTime()) / MS_PER_DAY)
+        )
+      : 365;
+    const angle = (risshun.solar_longitude + 360 * (88 / lengthDays)) % 360;
+    hachiju = { angle, dateText: formatMonthDay(target) };
+  }
 
   return (
     <svg
@@ -249,13 +311,41 @@ export default function SolarWheel() {
         activeName={highlight}
         activeLongitude={highlightLongitude}
       />
+      {hachiju && (() => {
+        const pos = polarToCartesian(200, 200, orbitRadius + 6, hachiju.angle);
+        return (
+          <g className="hachiju">
+            <text
+              x={pos.x}
+              y={pos.y - 4}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="hachiju-label"
+            >
+              八十八夜
+            </text>
+            <text
+              x={pos.x}
+              y={pos.y + 10}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="hachiju-date"
+            >
+              {hachiju.dateText}
+            </text>
+          </g>
+        );
+      })()}
       {highlight && (
         <g className="highlight-panel">
           <rect x={32} y={-118} width={336} height={100} rx={18} />
-          <text x={56} y={-66} textAnchor="start" className="highlight-name">
+          <text x={56} y={-84} textAnchor="start" className="highlight-furigana">
+            {highlightFurigana}
+          </text>
+          <text x={56} y={-58} textAnchor="start" className="highlight-name">
             {highlight}
           </text>
-          <text x={210} y={-66} textAnchor="start" className="highlight-meta">
+          <text x={210} y={-58} textAnchor="start" className="highlight-meta">
             <tspan x={210}>{highlightYear}年 {highlightDate}</tspan>
             <tspan x={210} dy={22} className="highlight-desc">
               {highlightDesc}
