@@ -63,6 +63,14 @@ const SEKKI_DESC: Record<string, string> = {
   啓蟄: "虫が動き始める",
 };
 
+const SEKKI_DEFAULT_DATE: Record<string, string> = {
+  啓蟄: "03-05",
+  穀雨: "04-20",
+  小満: "05-21",
+  芒種: "06-06",
+  処暑: "08-23",
+};
+
 export default function SolarWheel() {
   const [sekki, setSekki] = useState<Sekki[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -139,6 +147,9 @@ export default function SolarWheel() {
   }
 
   function fallbackDate(name: string): string {
+    const fixed = SEKKI_DEFAULT_DATE[name];
+    if (fixed) return `${currentYear}-${fixed}T00:00:00`;
+
     const list = byName.get(name);
     if (!list || list.length === 0) return "";
 
