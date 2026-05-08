@@ -312,7 +312,7 @@ export default function SolarWheel() {
         activeLongitude={highlightLongitude}
       />
       {hachiju && (() => {
-        const pos = polarToCartesian(200, 200, orbitRadius + 6, hachiju.angle);
+        const pos = polarToCartesian(200, 200, orbitRadius + 18, hachiju.angle);
         return (
           <g className="hachiju">
             <text
@@ -339,13 +339,13 @@ export default function SolarWheel() {
       {highlight && (
         <g className="highlight-panel">
           <rect x={32} y={-118} width={336} height={100} rx={18} />
-          <text x={56} y={-84} textAnchor="start" className="highlight-furigana">
+          <text x={56} y={-88} textAnchor="start" className="highlight-furigana">
             {highlightFurigana}
           </text>
-          <text x={56} y={-58} textAnchor="start" className="highlight-name">
+          <text x={56} y={-44} textAnchor="start" className="highlight-name">
             {highlight}
           </text>
-          <text x={210} y={-58} textAnchor="start" className="highlight-meta">
+          <text x={210} y={-44} textAnchor="start" className="highlight-meta">
             <tspan x={210}>{highlightYear}年 {highlightDate}</tspan>
             <tspan x={210} dy={22} className="highlight-desc">
               {highlightDesc}
